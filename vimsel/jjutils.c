@@ -102,9 +102,7 @@ gboolean goto_char_generic(gchar caracter)
 		gchar *line = sci_get_line(sci, num);
 		int i, c = 0;
 
-		//TODO: hacer la búsqueda de una sola parte
-		
-		//primero busca desde donde estoy:
+		/* primero busca desde donde estoy: */
 		for (i = pos; i < n; ++i){
 			if (line[i] == caracter){
 				sci_set_current_position(sci, actual+c+1, TRUE);
@@ -113,8 +111,8 @@ gboolean goto_char_generic(gchar caracter)
 			c++;
 		}
 		
-		//si no encontró, busca desde el comienzo de la línea
-		//de esta forma hace una búsqueda circular en la línea
+		/* si no encontró, busca desde el comienzo de la línea
+		 * de esta forma hace una búsqueda circular en la línea */
 		c = 0;
 		for (i = 0; i < pos; ++i){
 			if (line[i] == caracter){
@@ -144,25 +142,25 @@ static void select_inner(GtkMenuItem *menuitem, gpointer gdata)
 		 * busco para atrás un paréntesis:
 		 */
 		
-		//si hay una selección, me corro para afuera
+		/* si hay una selección, me corro para afuera */
 		if (sci_get_selected_text_length(sci) > 1)
 			actual = sci_get_selection_start(sci) - 1;
 			
-		int pos = actual - pos_ini_line; //pos dentro de la línea
+		int pos = actual - pos_ini_line; /* pos dentro de la línea */
 		
 		for (i = pos - 1; i >= 0; --i){
 			if (SEARCH){
 				a = actual - c;
-				//encontré uno, buscar su pareja
+				/* encontré uno, buscar su pareja */
 				b = sci_find_matching_brace(sci, a-1);
-				//ver si b está adelante de mí, sino corresponde a otro paréntesis
+				/* ver si b está adelante de mí, sino corresponde a otro paréntesis */
 				if (b >= actual){
 					sci_set_selection_start(sci, a);
 					sci_set_selection_end(sci, b);
-					//listo, todo bien, salir
+					/* listo, todo bien, salir */
 					break;
 				}
-				//sino sigue buscando otro
+				/* sino sigue buscando otro */
 			}
 			c++;
 		}
@@ -230,18 +228,21 @@ static void goto_comilla_kb(G_GNUC_UNUSED guint key_id){
  * ubica al principio de la palabra
  ***************************************************************************/
 static void goto_parameter(GtkMenuItem *menuitem, gpointer user_data){
-	goto_char_generic((gchar)',');
-	//TODO: ver esto para que ignore espacios
-	/*
+
 	if (goto_char_generic((gchar)',')){
 		/* si encontró la coma, ubicarse al comienzo de la palabra (ignorar
-		 * espacios *
+		 * espacios */
 		ScintillaObject *sci = scintilla_get_current();
 		if (sci){
-			int actual = sci_get_current_position(sci), i;
-			for (i=0; i<; ++i){
+			gchar *line = sci_get_line(sci, sci_get_current_line(sci));
+			int actual = sci_get_current_position(sci) - sci_get_position_from_line(sci, sci_get_current_line(sci));
+			int i = actual, c = 0;
+			while (line[i] == ' '){
+				i++; c++;
 			}
-	*/
+			sci_set_current_position(sci, sci_get_current_position(sci) + c,  TRUE);
+		}
+	}
 	
 }
 static void goto_parameter_kb(G_GNUC_UNUSED guint key_id){
