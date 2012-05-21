@@ -8,8 +8,9 @@ int main(){
     jjConfig c("aaaa");
     c.SetValor("casa", "sarmiento");
     string s = c.Valor("casa", "ninguna");
-    c.SetValor("num", 1683);
-    int i = c.ValorInt("num", 5);
+    c.SetValor("num", "casa");
+    //cout<<strtod("77.7778", NULL)<<endl;
+    float i = c.ValorDouble("num", 5);
 
     //c.SetValor("float", 3.14156);
 

@@ -1,6 +1,7 @@
-//jjConfig versi髇 0.4
+
+//jjConfig versi贸n 0.4
 //
-//Clase simple para guardar opciones de configuraci髇 en un archivo.
+//Clase simple para guardar opciones de configuraci贸n en un archivo.
 //
 //Creado por Juan Bertinetti.
 
@@ -14,12 +15,20 @@
 
 using namespace std;
 
+/// Clase jjConfig
+/**
+ * Clase principal. Para usar jjConfig hay que crear un objeto de tipo jjConfig
+ * y luego trabajar con sus m茅todos p煤blicos. Al instanciar el objeto se cargan
+ * las opciones de configuraci贸n le铆das de un archivo a memoria.
+ */
 class jjConfig {
 private:
-	map<string, string> data; //guardar los datos en memoria
-	string file; //ruta del archivo en disco
+	map<string, string> data; ///< Mapa que guarda los datos
+	string file; ///< Indica la ruta del archivo de configuraci贸n en disco
 	
-	//funciones de utiler韆
+	bool cargar_datos();
+	
+	/* funciones de utiler铆a: */
 	string& trim(string&);
 	int str2int(string&);
 	unsigned int str2uint(string&);
@@ -27,8 +36,6 @@ private:
 	string uint2str(unsigned int);
 	double str2dbl(string&);
 	string dbl2str(double);
-
-	bool cargar_datos();
 	
 public:
 	jjConfig(string);
@@ -45,7 +52,6 @@ public:
 	int ValorInt(string, int);
 	unsigned int ValorUInt(string, unsigned int);
 	double ValorDouble(string, double);
-	
 	
 };
 
