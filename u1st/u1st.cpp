@@ -107,7 +107,7 @@ void error_salir()
 {
 	cout<<"Error ejecutando u1sdtool. El cliente de Ubuntu One puede no\
 			estar instalado.\n";
-	exit(1);
+	abort();
 }
 
 int main(){
