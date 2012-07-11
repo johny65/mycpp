@@ -18,10 +18,14 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=-1
+current_page=0
+FILE_NAME_0=2762;C++;0;16;1;1;0;/home/johny/Escritorio/Proyectos/mycpp/pdfboo/src/pdfdocument.cpp;0;4
+FILE_NAME_1=99;C++;0;16;1;1;0;/home/johny/Escritorio/Proyectos/mycpp/pdfboo/src/pdfdocument.h;0;4
+FILE_NAME_2=1027;C++;0;16;1;1;0;/home/johny/Escritorio/Proyectos/mycpp/pdfboo/src/main.cpp;0;4
+FILE_NAME_3=22928;C++;0;16;0;1;0;/home/johny/Descargas/podofo-0.9.1/src/doc/PdfDocument.cpp;0;4
 
 [VTE]
-last_dir=/home/johny/Descargas
+last_dir=/home/johny/Escritorio/Proyectos/mycpp/pdfboo/bin
 
 [gproject]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;
