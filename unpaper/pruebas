@@ -1,0 +1,22 @@
+	
+		cuadrante = h2.get_crop(W/2, 0, W-1, H/2-1);
+		int X = -1, Y = -1;
+		for (int y=0; y<cuadrante.height(); ++y){
+			if (cuadrante.line(y).max() != 0){
+				Y = y;
+				break;
+			}
+		}
+		//cuadrante.get_line(Y).display();
+		for (int x=0; x<cuadrante.width(); ++x){
+			if (cuadrante(x, Y) != 0){
+				X = x;
+				break;
+			}
+		}
+		cout<<"X: "<<X<<" Y: "<<Y<<endl;
+		float ang = atan2((H/2 - Y)*1.0, X*1.0);
+		cout<<"ang: "<<ang<<endl;
+		
+		img.rotate(ang, 0, H/2 - 1, 1, 1);
+		img.display();	
