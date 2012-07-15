@@ -1,5 +1,5 @@
-#ifndef PDFDOCUMENT_H
-#define PDFDOCUMENT_H
+#ifndef _PDFDOCUMENT_H_
+#define _PDFDOCUMENT_H_
 
 #include <fstream>
 #include <string>
