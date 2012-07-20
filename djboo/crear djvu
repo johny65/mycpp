@@ -1,0 +1,6 @@
+convert -contrast (tantas veces como necesario)
+convert -normalize
+convert _.png _.ppm
+cpaldjvu -colors 8 _.ppm _.djvu
+djvm -c fin.djvu *.djvu
+
