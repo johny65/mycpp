@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <cstdlib>
 
 /*
 djvused -e 'set-outline outline' e-text.djvu -s
@@ -9,7 +10,15 @@ djvused -e 'set-outline outline' e-text.djvu -s
 
 using namespace std;
 
-string trim(string Cadena)
+///Elimina espacios al inicio y fin de una cadena.
+/**
+ * Elimina todos los caracteres de espacio y caracteres \c CR (<i>Carriage
+ * Return</i>) que se encuentren al inicio y al final de una cadena.
+ *
+ * \param Cadena Cadena a procesar.
+ * \return Una nueva cadena sin espacios en los extremos.
+ */
+string trim(const string &Cadena)
 {
 	unsigned int i, j;
 	for (i=0; i<Cadena.length(); ++i){
@@ -18,56 +27,43 @@ string trim(string Cadena)
 	for (j=Cadena.length()-1; j>=0; --j){
 		if (Cadena[j] != ' ' && Cadena[j] != char(13)) break;
 	}
-	Cadena = Cadena.substr(i, j+1);
-	return Cadena;
+	string res = Cadena.substr(i, j+1);
+	return res;
 }
 
-int main(int argc, char *argv[]){
 
-	/* nombres de archivo por defecto: */
-	char DEFAULT_IN[] = "outline.txt";
-	char DEFAULT_OUT[] = "out.txt";
+vector<string> cargar_archivo(const char *filename)
+{
+	vector<string> archivo;
 	
-	int o;
-	char *filename_in = DEFAULT_IN;
-	char *filename_out = DEFAULT_OUT;
-	opterr = 0; //desactivo mensajes de error predeterminados
-
-	while ((o = getopt(argc, argv, "o:")) != -1){
-		switch (o){
-			case 'o': {
-				filename_out = optarg;
-				break;
-			}
-			case '?': {
-				if (optopt == 'o')
-					cout<<"Falta un parámetro: indicar nombre de archivo para la opción -o.\n";
-				else
-					cout<<"Opción inválida: -"<<char(optopt)<<endl;
-				return EXIT_FAILURE;
-			}
-		}
-	}
-	if (optind == argc-1)
-		filename_in = argv[optind];
-
-	cout<<"Entrada: "<<filename_in<<endl;
-	cout<<"Salida: "<<filename_out<<endl;
-	return 0;
-	
-	
-	
-	ifstream entrada("outline.txt");
+	ifstream entrada(filename);
 	if (!entrada.good()){
 		cout<<"Error al abrir el archivo.\n";
-		return EXIT_FAILURE;
+		return archivo;
 	}
-	ofstream salida("contents", ios::trunc);
+	
+	string l;
+	while (getline(entrada, l))
+		archivo.push_back(l);
+	entrada.close();
+
+	return archivo;
+}
+
+bool guardar_outlines()
+{
+	int ret = system("djvused -e 'set-outline outline' e-text.djvu -s");
+	return !ret;
+}
+
+void procesar_outline(const vector<string> &entrada, const char *archivo_salida)
+{
+	ofstream salida(archivo_salida, ios::trunc);
 	salida<<"(bookmarks";
 	string l;
-	vector<string> archivo;
 	int nivel = -1;
-	while (getline(entrada, l)){
+	for (size_t i=0; i<entrada.size(); ++i){
+		l = entrada[i];
 		//contar tabs
 		int canttabs = 0;
 		int i = 0;
@@ -94,5 +90,44 @@ int main(int argc, char *argv[]){
 	for (int i = 0; i<nivel+2; ++i)
 		salida<<")\n";
 	salida.close();
+}
+
+int main(int argc, char *argv[]){
+
+	/* nombres de archivo por defecto: */
+	char DEFAULT_IN[] = "outline.txt";
+	char DEFAULT_OUT[] = "out.txt";
+	
+	int o;
+	char *filename_in = DEFAULT_IN;
+	char *filename_out = DEFAULT_OUT;
+	
+	#ifdef DEBUG
+		opterr = 1;
+	#else
+		opterr = 0; //desactivo mensajes de error predeterminados
+	#endif
+
+	while ((o = getopt(argc, argv, "o:")) != -1){
+		switch (o){
+			case 'o': {
+				filename_out = optarg;
+				break;
+			}
+			case '?': {
+				if (optopt == 'o')
+					cout<<"Falta un parámetro: indicar nombre de archivo para la opción -o.\n";
+				else
+					cout<<"Opción inválida: -"<<char(optopt)<<endl;
+				return EXIT_FAILURE;
+			}
+		}
+	}
+	if (optind == argc-1)
+		filename_in = argv[optind];
+
+	cout<<"Entrada: "<<filename_in<<endl;
+	cout<<"Salida: "<<filename_out<<endl;
 	return 0;
+	
 }
