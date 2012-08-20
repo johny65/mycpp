@@ -1,4 +1,5 @@
 #include "pdfdocument.h"
+#include "debug.h"
 
 
 PDFDocument::PDFDocument(const char *archivo)
@@ -50,7 +51,7 @@ bool PDFDocument::extract_bookmarks(ofstream &salida, PdfOutlineItem* pItem, int
 		//salida<<title.GetStringUtf8();
 	//else if (title.IsValid() && !title.IsUnicode())
 		//salida<<title.GetString();
-	salida<<escape(title.ToUnicode().GetStringUtf8());
+	salida<<pdfboo_utils::escape(title.ToUnicode().GetStringUtf8());
 	salida<<";";
 
 
@@ -103,6 +104,7 @@ bool PDFDocument::extract_bookmarks(ofstream &salida, PdfOutlineItem* pItem, int
 			}
 		}
 	} //else it's one or more actions, not supported
+	///<\todo ver los de las acciones
 	salida<<endl;
 
 	if (pItem->First())
@@ -119,55 +121,56 @@ bool PDFDocument::ExtraerBookmarks(ofstream &salida)
 	return extract_bookmarks(salida, NULL, 0);
 }
 
-bool PDFDocument::InsertarBookmarks(ifstream &entrada)
+
+bool PDFDocument::InsertarBookmarks(vector<Outline> &books)
 {
+	int current_level = books[0].nivel;
+	if (current_level != 0)
+		return false;
+		
 	clear_bookmarks();
 	PdfOutlines *outs = this->pdf.GetOutlines(true); //empty
 
-	int current_level = 0;
-	int level;
-	string *tokens;
-	string ops, tit, dir, type;
-	int pag;
-	stringstream ss;
-
+	//start with the root:
 	
-	string line;
-	while (getline(entrada, line)){
-		tokens = split(line);
-		cout<<"Token0: "<<tokens[0]<<endl;
-		ss.str(tokens[0]); ss>>level; level--;
-		ops = tokens[1];
-		tit = tokens[2];
-		dir = tokens[3];
-		delete[] tokens;
+	PdfOutlineItem *raiz = outs->CreateRoot(books[0].titulo);
+	PdfPage *pag = this->pdf.GetPage(books[0].dest[0] - 1);
+	PdfDestination dest(pag);
+	raiz->SetDestination(dest);
+	raiz->SetTextFormat(books[0].format);
 
-		ss.str(dir); ss>>pag>>type;
+	/* guarda una referencia al último PdfOutlineItem de cada nivel, para poder
+	 * seguir agregando outlines hijos (nivel siguiente) */
+	vector<PdfOutlineItem*> arbol;
+	arbol.push_back(raiz);
 
-		//crear un destination con el constructor apropiado según el tipo
-		//PdfDestination dest(
-		//PdfOutlineItem( item(
-		cout<<"Página: "<<pag<<endl;
-		cout<<"Nivel: "<<level<<endl;
-		cout<<"Título: "<<tit<<endl;
-		cout<<"Tipo: "<<type<<endl;
-	}
+	dbg("Raíz creada.");
+	
+	PdfOutlineItem *current;
+	for (size_t i=1; i<books.size(); ++i){
 
-	return true;
-}
+		current_level = books[i].nivel;
+		
+		PdfPage *pag = this->pdf.GetPage(books[i].dest[0] - 1);
+		PdfDestination dest(pag);
 
-string PDFDocument::escape(const string &utf8)
-{
-	string res;
-	for (int i=0; i<utf8.size(); ++i){
-		if (utf8.at(i) == '\\')
-			res += "\\5C";
-		else if (utf8.at(i) == ';')
-			res += "\\3B";
+		if (current_level == 0) //same level as the root
+			current = arbol[0]->CreateNext(books[i].titulo, dest);
 		else
-			res += utf8.at(i);
+			current = arbol[current_level-1]->CreateChild(books[i].titulo, dest);
+
+		current->SetTitle(books[i].titulo);
+		current->SetTextFormat(books[i].format);
+		
+		if (current_level == arbol.size())
+			arbol.push_back(current);
+		else
+			arbol[current_level] = current;
+		
+		dbg("Siguiente...");
 	}
-	return res;
+
+	this->pdf.Write("salida.pdf");
 }
 
 void PDFDocument::EliminarBookmarks()
@@ -183,20 +186,41 @@ void PDFDocument::clear_bookmarks()
 	pdf.GetCatalog()->GetDictionary().AddKey("Outlines", m_pOutlines->GetObject()->Reference());
 }
 
-string* PDFDocument::split(const string &s)
+vector<Outline> PDFDocument::cargar_csv(const char *archivo)
 {
-	#define NUM 4
-	string *res = new string[NUM];
-	int pos = 0, ind = 0;
+	vector<Outline> res;
+	ifstream entrada(archivo);
+	if (!entrada.good())
+		return res;
+	
+	string line;
+	string *tokens;
+	while (getline(entrada, line)){
+		tokens = pdfboo_utils::split(line);
+		Outline nuevo;
+		nuevo.nivel = pdfboo_utils::str2int(tokens[0]) - 1;
+		if (tokens[1] == "B")
+			nuevo.format = ePdfOutlineFormat_Bold;
+		else if (tokens[1] == "I")
+			nuevo.format = ePdfOutlineFormat_Italic;
+		else if (tokens[1] == "IB" || tokens[1] == "BI")
+			nuevo.format = ePdfOutlineFormat_BoldItalic;
+		else
+			nuevo.format = ePdfOutlineFormat_Unknown;
 
-	for (int i=0; i<s.length(); ++i){
-		if (s[i] == ';'){
-			res[ind] = s.substr(pos, i-pos);
-			pos = i + 1;
-			ind++;
-		}
+		nuevo.titulo = tokens[2];
+		
+		stringstream ss(tokens[3]);
+		int pag;
+		ss>>pag;
+		vector<int> v; v.push_back(pag);
+		nuevo.dest = v;
+		
+		delete[] tokens;
+
+		res.push_back(nuevo);
+
 	}
-	res[ind] = s.substr(pos);
 
 	return res;
 }

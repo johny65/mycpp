@@ -5,24 +5,34 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vector>
 #include <podofo/podofo.h>
+#include "utils.h"
 
 using namespace std;
 using namespace PoDoFo;
+
+class Outline {
+public:
+	int nivel;
+	EPdfOutlineFormat format;
+	string titulo;
+	vector<int> dest;
+};
+
 
 class PDFDocument {
 private:
 	PdfMemDocument pdf;
 	bool extract_bookmarks(ofstream &salida, PdfOutlineItem* pItem, int level);
-	string escape(const string &utf8);
 	void clear_bookmarks();
-	string* split(const string &s);
 	
 public:
+	vector<Outline> cargar_csv(const char *archivo);
 	PDFDocument(const char *archivo);
 	~PDFDocument();
 	bool ExtraerBookmarks(ofstream &salida);
-	bool InsertarBookmarks(ifstream &entrada);
+	bool InsertarBookmarks(vector<Outline> &books);
 	void EliminarBookmarks();
 
 };

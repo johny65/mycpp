@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char **argv){
 
 /*
 	PdfMemDocument pdf("1.pdf");
@@ -40,16 +40,17 @@ int main(){
 	//outs->First()->SetTitle("A ver!!!!!!");
 	//pdf.Write("salida.pdf");
 
-	PDFDocument pdf("1.pdf");
-	//ofstream salida("books");
+	PDFDocument pdf(argv[1]);
+	//ofstream salida("out");
 	//pdf.ExtraerBookmarks(salida);
 	//salida.close();
 
 	//pdf.EliminarBookmarks();
 
-	ifstream entrada("books");
-	pdf.InsertarBookmarks(entrada);
-	entrada.close();
+	//ifstream entrada("books");
+	vector<Outline> v = pdf.cargar_csv("books");
+	pdf.InsertarBookmarks(v);
+	//entrada.close();
 	
 	return 0;
 }
