@@ -5,7 +5,7 @@
 PDFDocument::PDFDocument(const char *archivo)
 {
 	pdf.Load(archivo);
-	
+	this->out_filename = "salida.pdf";
 }
 
 
@@ -170,13 +170,14 @@ bool PDFDocument::InsertarBookmarks(vector<Outline> &books)
 		dbg("Siguiente...");
 	}
 
-	this->pdf.Write("salida.pdf");
+	this->pdf.Write(this->out_filename);
+	return true;
 }
 
 void PDFDocument::EliminarBookmarks()
 {
 	clear_bookmarks();
-	this->pdf.Write("salida.pdf");
+	this->pdf.Write(this->out_filename);
 }
 
 void PDFDocument::clear_bookmarks()

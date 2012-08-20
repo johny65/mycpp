@@ -24,6 +24,7 @@ public:
 class PDFDocument {
 private:
 	PdfMemDocument pdf;
+	string out_filename;
 	bool extract_bookmarks(ofstream &salida, PdfOutlineItem* pItem, int level);
 	void clear_bookmarks();
 	
