@@ -1,8 +1,10 @@
 Repositorio con mis proyectos en C++ o C.
 
 * jjUtils (plugin para Geany)
+* ctrlh (plugin para Geany)
 * jjConfig
 * u1st (Ubuntu One Status)
 * unpaper
 * pava
 * djboo
+* ArgParser (parseador de parámetros de consola basado en getopt)
