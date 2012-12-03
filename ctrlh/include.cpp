@@ -102,7 +102,7 @@ gchar *get_current_word()
 /**
  * Insert the '#include <header>' directive
  */
-void insert_header(string header)
+void insert_header(const string &header)
 {
 	ScintillaObject *sci = scintilla_get_current();
 	GeanyEditor *editor = geany_editor_get_current();
@@ -155,7 +155,8 @@ static void buscar()
 	else
 		funcion = p;
 		
-	GString *headers = g_string_sized_new(150); ///<\todo usar vector<string> u otra cosa
+	
+	GString *headers = g_string_sized_new(256);
 	int count = 0;
 	
 	while (archivo>>buffer){
@@ -172,7 +173,8 @@ static void buscar()
 	archivo.close();
 
 	if (count == 1){
-		insert_header(headers->str); ///<\todo ver el \n al final
+		string header = headers->str;
+		insert_header(header.substr(0, header.length()-1)); //quita el '\n' del final
 	}
 	else if (count > 1){
 		SSM(scintilla_get_current(), SCI_USERLISTSHOW, AUTOHEADER_LIST_TYPE,
