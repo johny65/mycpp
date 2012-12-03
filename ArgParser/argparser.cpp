@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <getopt.h>
 #include "argparser.h"
 
 void ArgParser::opcion(const char *nombre, char opcion,
@@ -56,7 +57,7 @@ void ArgParser::parsear(bool mostrar_uso)
 }
 
 
-int ArgParser::get(const char *nombre)
+string& ArgParser::get(const char *nombre)
 {
 	verificar_parseado();
 	string snombre(nombre);
@@ -65,14 +66,51 @@ int ArgParser::get(const char *nombre)
 		cerr<<"Error: No fue agregada una opción con el nombre \""<<snombre<<"\".\n";
 		abort();
 	}
-	else {
-		stringstream ss;
-		ss<<it->second;
-		int res;
-		ss>>res;
-		return res;
-	}
+	return it->second;
 }
+
+
+int ArgParser::get_int(const char *nombre)
+{
+	int res;
+	stringstream(get(nombre))>>res;
+	return res;
+}
+
+unsigned int ArgParser::get_uint(const char *nombre)
+{
+	unsigned int res;
+	stringstream(get(nombre))>>res;
+	return res;
+}
+
+
+double ArgParser::get_double(const char *nombre)
+{
+	double res;
+	stringstream(get(nombre))>>res;
+	return res;
+}
+
+
+float ArgParser::get_float(const char *nombre)
+{
+	float res;
+	stringstream(get(nombre))>>res;
+	return res;
+}
+
+
+string ArgParser::get_string(const char *nombre)
+{
+	return get(nombre);
+}
+
+const char* ArgParser::get_char(const char *nombre)
+{
+	return get(nombre).c_str();
+}
+
 
 bool ArgParser::is(const char *nombre)
 {
@@ -105,5 +143,6 @@ void ArgParser::opcion_bool(const char *nombre, char opcion, const char *descrip
 
 vector<const char*> ArgParser::get_sueltos()
 {
+	verificar_parseado();
 	return this->sueltos;
 }

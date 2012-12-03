@@ -24,6 +24,7 @@ private:
     map<char, string> mapeo_bool;
     vector<const char*> sueltos;
 
+    string& get(const char *nombre);
     void verificar_parseado();
 
 public:
@@ -32,7 +33,12 @@ public:
     void opcion_bool(const char *nombre, char opcion, const char *descripcion);
     void opcion(const char *nombre, char opcion, const char *descripcion, const char *defecto);
     void parsear(bool mostrar_uso = true);
-    int get(const char *nombre);
+    int get_int(const char *nombre);
+    unsigned int get_uint(const char *nombre);
+    double get_double(const char *nombre);
+    float get_float(const char *nombre);
+    string get_string(const char *nombre);
+    const char* get_char(const char *nombre);
     bool is(const char *nombre);
     void mostrar_ayuda();
     vector<const char*> get_sueltos();

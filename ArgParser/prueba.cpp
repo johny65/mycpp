@@ -8,7 +8,7 @@ int main(int argc, char **argv){
     p.opcion_bool("b", 'b', "Algo sin parámetros");
     
     p.parsear();
-    double o = p.get("uno");
+    double o = p.get_double("uno");
     cout<<"La opción pasada es: "<<o<<endl;
     if (p.is("b"))
 	cout<<"Se pasó la b.\n";
